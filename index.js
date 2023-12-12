@@ -40,8 +40,6 @@ admin.initializeApp({
   databaseURL: "https://sn-fitness-default-rtdb.firebaseio.com",
   authDomain: "sn-fitness.firebaseapp.com",
 });
-var db = admin.database();
-var userRef = db.ref("members");
 
 const { memberRouter } = require("./routes/member");
 const { trainerRouter } = require("./routes/trainer");
@@ -78,3 +76,14 @@ new CronJob('00 00 00 * * *', function() {
   },
   true /* Start the job right now */
 );
+
+// YOUR_BASE_DIRECTORY/netlify/functions/api.ts
+
+import serverless from "serverless-http";
+
+const router = Router();
+router.get("/hello", (req, res) => res.send("Hello World!"));
+
+app.use("/api/", router);
+
+export const handler = serverless(app);
