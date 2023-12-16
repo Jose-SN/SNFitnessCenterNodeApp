@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start-dev": "node functions/api.js",
-    "build": "netlify deploy --prod"
+    "build": "set NODE_OPTIONS=--openssl-legacy-provider && netlify deploy --prod"
   },
   "dependencies": {
     "@netlify/functions": "^2.4.0",
