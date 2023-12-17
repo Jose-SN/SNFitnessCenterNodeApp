@@ -40,9 +40,9 @@ function sendMsgToDueMembers(dueMembers) {
       let fee = member.lastpayment.feeamount;
       let nextpaymentdate = member.lastpayment.nextpaymentdate;
       nextpaymentdate = nextpaymentdate.split('T')[0];
-      let text = data.duesmscontent.replace('${user_name}', `${member.fname} ${member.lname}`);
-      text = text.replace('${due_payment}', fee);
-      text = text.replace('${due_date}', nextpaymentdate);
+      let text = data.duesmscontent.replace('$user_name', `${member.fname} ${member.lname}`);
+      text = text.replace('$due_payment', fee);
+      text = text.replace('$due_date', nextpaymentdate);
       sendSMS({phoneNumber: member.contact, text}).then(data=>{
         console.log('successfully send sms', data)
       });
