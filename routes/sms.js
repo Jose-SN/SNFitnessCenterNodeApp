@@ -1,7 +1,9 @@
 const express = require("express");
 const smsRouter = express.Router();
 const axios = require('axios');
-const fast2sms = require('fast-two-sms')
+// const fast2sms = require('fast-two-sms')
+var unirest = require("unirest");
+var req = unirest("POST", "https://www.fast2sms.com/dev/bulkV2");
 const API_KEY_FAST2SMS = process.env.API_KEY_FAST2SMS;
 
 smsRouter.post("/send", async (req, res) => {
@@ -24,19 +26,39 @@ smsRouter.post("/send", async (req, res) => {
 const sendSMS = function (bodyData) {
   return new Promise(async (resolve, reject) => {
     try {
-      var options = {
-        authorization : API_KEY_FAST2SMS, 
-        message : bodyData.text,  
-        numbers : [bodyData.phoneNumber]
-      } 
-
-      await fast2sms.sendMessage(options).then(response=>{
-        console.log(response)
-        resolve(response.data);
-      }).catch((error)=>{
-        console.error(error);
-        reject(error);
+      req.headers({
+        "authorization": API_KEY_FAST2SMS
       });
+      
+      req.form({
+        "message": bodyData.text,
+        "language": "english",
+        "route": "q",
+        "numbers": bodyData.phoneNumber,
+      });
+      
+      req.end(function (res) {
+        if (res.error) {
+          console.log(res.body.message);
+          reject(res.body);
+        } else {
+          resolve(res.body);
+        }
+      });
+      // var options = {
+      //   authorization : API_KEY_FAST2SMS, 
+      //   message : bodyData.text,  
+      //   route: "q",
+      //   numbers : [bodyData.phoneNumber]
+      // } 
+
+      // await fast2sms.sendMessage(options).then(response=>{
+      //   console.log(response)
+      //   resolve(response.data);
+      // }).catch((error)=>{
+      //   console.error(error);
+      //   reject(error);
+      // });
     } catch (error) {
       console.error(error);
       reject(error);
