@@ -1,6 +1,8 @@
 const express = require("express");
 const smsRouter = express.Router();
 const axios = require('axios');
+const fast2sms = require('fast-two-sms')
+const API_KEY_FAST2SMS = process.env.API_KEY_FAST2SMS;
 
 smsRouter.post("/send", async (req, res) => {
   const bodyData = req.body;
@@ -22,21 +24,19 @@ smsRouter.post("/send", async (req, res) => {
 const sendSMS = function (bodyData) {
   return new Promise(async (resolve, reject) => {
     try {
-      const options = {
-        method: 'POST',
-        url: 'https://telesign-telesign-send-sms-verification-code-v1.p.rapidapi.com/sms-verification-code',
-        params: {
-          phoneNumber: bodyData.phoneNumber,
-          text: bodyData.text
-        },
-        headers: {
-          'X-RapidAPI-Key': 'SIGN-UP-FOR-KEY',
-          'X-RapidAPI-Host': 'telesign-telesign-send-sms-verification-code-v1.p.rapidapi.com'
-        }
-      };
-      const response = await axios.request(options);
-      console.log(response.data);
-      resolve(response.data);
+      var options = {
+        authorization : API_KEY_FAST2SMS, 
+        message : bodyData.text,  
+        numbers : [bodyData.phoneNumber]
+      } 
+
+      await fast2sms.sendMessage(options).then(response=>{
+        console.log(response)
+        resolve(response.data);
+      }).catch((error)=>{
+        console.error(error);
+        reject(error);
+      });
     } catch (error) {
       console.error(error);
       reject(error);
