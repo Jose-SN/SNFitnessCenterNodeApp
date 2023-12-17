@@ -21,9 +21,10 @@ function findDueMembers() {
           element.expectedpaymentdate = lastdata.nextpaymentdate;
           var diff = new Date(lastdata.nextpaymentdate).getTime() - new Date().getTime();
           var diffDays = diff / (1000 * 60 * 60 * 24);   
-          if(diffDays == 0 && new Date().getDate() === new Date().getDate(lastdata.nextpaymentdate)) {
+          if(parseInt(Math.abs(diffDays)) == 0 && new Date().getDate() === new Date().getDate(lastdata.nextpaymentdate)) {
             element.status = 'Due';
             element.diffDays = Math.round(diffDays);
+            element.lastpayment = lastdata;
           }
         }
       });
@@ -36,8 +37,14 @@ function findDueMembers() {
 function sendMsgToDueMembers(dueMembers) {
   getSettingsData().then(data=>{
     dueMembers.forEach(member=>{
-      sendSMS({phoneNumber: member.contact, text: data.smscontent}).then(data=>{
-        console.log('successfully send sms')
+      let fee = member.lastpayment.feeamount;
+      let nextpaymentdate = member.lastpayment.nextpaymentdate;
+      nextpaymentdate = nextpaymentdate.split('T')[0];
+      let text = data.duesmscontent.replace('${user_name}', `${member.fname} ${member.lname}`);
+      text = text.replace('${due_payment}', fee);
+      text = text.replace('${due_date}', nextpaymentdate);
+      sendSMS({phoneNumber: member.contact, text}).then(data=>{
+        console.log('successfully send sms', data)
       });
     })
   })
